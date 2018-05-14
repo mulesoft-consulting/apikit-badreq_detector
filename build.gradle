@@ -1,0 +1,64 @@
+group 'com.mulesoft.ps.util'
+version '1.0.0'
+
+configurations {
+    provided
+}
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
+}
+
+sourceCompatibility = 1.5
+
+def getMavenCreds = { String id ->
+    def m2Dir = new File(System.getProperty('user.home'), '.m2')
+    def settingsXmlPath = new File(m2Dir, 'settings.xml')
+    assert settingsXmlPath.exists()
+    def xmlNode = new XmlParser().parse(settingsXmlPath.absolutePath)
+    def serverCreds = xmlNode.servers.server.find { node -> node.id.text() == id }
+    assert serverCreds != null
+    [user: serverCreds.username.text(), password: serverCreds.password.text()]
+}
+
+def eeCreds = getMavenCreds('avio-mule-ee-releases')
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url 'https://devops.avioconsulting.com/nexus/repository/mulesoft-ee-releases/'
+        credentials {
+            username eeCreds.user
+            password eeCreds.password
+        }
+    }
+    maven {
+        url 'http://repository.mulesoft.org/releases/'
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: 'https://www.somerepo.com/') {
+                authentication userName: eeCreds.user,
+                               password: eeCreds.password
+            }
+        }
+    }
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.4'
+    def muleVersion = '3.8.5'
+    compile "org.mule.modules:mule-module-apikit:${muleVersion}"
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+}
