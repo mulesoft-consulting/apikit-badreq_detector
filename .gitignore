@@ -1,9 +1,8 @@
-/build
-/.settings
 /.idea
+/target
 /*.iml
-/tmp
-/.mule
-/pom.xml
-/.gradle
-/out
+/.apt_generated/
+/.settings
+/.classpath
+/.factorypath
+/.project

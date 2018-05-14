@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <!-- test org ID -->
+    <groupId>26d53683-6746-4040-ad07-f671f8e2b27e</groupId>
+    <artifactId>apikit-badrequest-extractor</artifactId>
+    <version>1.0.0</version>
+    <packaging>mule-module</packaging>
+    <name>Mule APIKit BadRequest Extractor</name>
+
+    <parent>
+        <groupId>org.mule.tools.devkit</groupId>
+        <artifactId>mule-devkit-parent</artifactId>
+        <version>3.9.0</version>
+    </parent>
+
+    <distributionManagement>
+        <repository>
+            <id>mule-exchange</id>
+            <name>Mule Exchange Repository</name>
+            <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/${project.groupId}/maven</url>
+            <layout>default</layout>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <executions>
+                    <!-- Want a default operation for this -->
+                    <execution>
+                        <id>fix-editors-xml</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <!-- If we don't force this, it doesn't work properly in the package phase
+                             even though it works fine in the compile phase -->
+                            <forceCreation>true</forceCreation>
+                            <transformationSets>
+                                <transformationSet>
+                                    <dir>${project.build.directory}/generated-sources/mule/apikit-badrequest-extractor</dir>
+                                    <includes>editors.xml</includes>
+                                    <stylesheet>${basedir}/fixes/editors.xsl</stylesheet>
+                                    <outputDir>${project.build.directory}/classes/apikit-badrequest-extractor</outputDir>
+                                </transformationSet>
+                            </transformationSets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <compilerId>groovy-eclipse-compiler</compilerId>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-compiler</artifactId>
+                        <version>2.9.2-01</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-batch</artifactId>
+                        <version>2.4.3-01</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <!-- Mule devkit Maven plugin does code generation in the default-generate-sources phase
+                    and will try and compile our connector+config class. it doesn't know Groovy so we force
+                    compilation of Groovy early on -->
+                    <execution>
+                        <id>groovy-classes</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <source>1.8</source>
+                            <target>1.8</target>
+                            <includes>
+                                <include>**/*.groovy</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- AnyPoint connector devkit uses this to generate the .classpath and Eclipse .project files
+                 for Studio. See below why we have this here -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.10</version>
+                <configuration>
+                    <sourceIncludes>
+                        <!-- We're using Groovy in this project. If we don't add this in here, then Groovy files are
+                         not compiled by Eclipse. This doesn't impact building the connector since Maven does that.
+                         What it does prevent is running the unit tests in Studio/Eclipse. By adding this in here,
+                         Eclipse will include groovy files in its compilation and unit tests can be run in the Eclipse
+                         JUnit runner -->
+                        <param>**/*.groovy</param>
+                    </sourceIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.4.4</version>
+            <!-- Doesn't need to be deployed in ZIP, engine already has this -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-apikit</artifactId>
+            <version>3.8.3</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <category>Community</category>
+        <licensePath>LICENSE.md</licensePath>
+        <devkit.studio.package.skip>false</devkit.studio.package.skip>
+        <type>connector</type>
+    </properties>
+    <repositories>
+        <repository>
+            <id>mulesoft-releases</id>
+            <name>MuleSoft Releases Repository</name>
+            <url>http://repository.mulesoft.org/releases/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+</project>
