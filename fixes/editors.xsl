@@ -5,7 +5,7 @@
     <xsl:template match="tooling:modeSwitch[@description='Operation.']">
         <xsl:copy>
             <xsl:apply-templates select="@*" />
-            <xsl:attribute name="defaultValue">http://www.mulesoft.org/schema/mule/apikit-badrequest-extractor/extract</xsl:attribute>
+            <xsl:attribute name="defaultValue">http://www.mulesoft.org/schema/mule/apikit-badrequest-extractor/parse</xsl:attribute>
             <xsl:apply-templates select="node()" />
         </xsl:copy>
     </xsl:template>
