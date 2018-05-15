@@ -1,0 +1,23 @@
+#%RAML 1.0
+title: apiDefinitionUploadTest
+version: 1.0
+baseUri: http://localhost/api/stuff
+types:
+  SimpleType: string
+  Foo:
+    type: object
+    properties:
+      prop1: string
+      prop2: string
+    example:
+      prop1: howdy
+      prop2: there
+
+/test:
+  post:
+    description: the test
+    body:
+      application/json: Foo
+    responses:
+      200:
+        description: success
