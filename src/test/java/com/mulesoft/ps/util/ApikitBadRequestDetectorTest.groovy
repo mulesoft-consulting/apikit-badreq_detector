@@ -59,9 +59,8 @@ class ApikitBadRequestDetectorTest {
                              flow)
     }
 
-
     @Test
-    void parse() {
+    void missing_field() {
         // arrange
         def inputEvent = getEvent([howdy: 123])
         def messageException = shouldFail {
@@ -72,6 +71,16 @@ class ApikitBadRequestDetectorTest {
 
         // act
         connector.parse(badRequestException)
+
+        // assert
+        fail 'write this'
+    }
+
+    @Test
+    void field_invalid_type() {
+        // arrange
+
+        // act
 
         // assert
         fail 'write this'
