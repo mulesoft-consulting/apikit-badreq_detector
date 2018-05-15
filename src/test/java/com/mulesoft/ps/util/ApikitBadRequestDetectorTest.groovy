@@ -162,7 +162,7 @@ class ApikitBadRequestDetectorTest {
     }
 
     @Test
-    void invalid_format() {
+    void invalid_format_date() {
         // arrange
         def inputEvent = getEvent([prop1: 'howdy',
                                    prop2: 'howdy',
@@ -183,6 +183,16 @@ class ApikitBadRequestDetectorTest {
                    is(equalTo('(Unknown field name)'))
         assertThat error.reason,
                    is(equalTo("Expected type 'String' but got 'Integer'"))
+        // assert
+        fail 'write this'
+    }
+
+    @Test
+    void invalid_format_regex() {
+        // arrange
+
+        // act
+
         // assert
         fail 'write this'
     }
