@@ -4,6 +4,11 @@ public class FieldError {
     private String fieldName;
     private String reason;
 
+    public FieldError(String fieldName, String reason) {
+        this.fieldName = fieldName;
+        this.reason = reason;
+    }
+
     public String getFieldName() {
         return fieldName;
     }

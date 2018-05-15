@@ -62,9 +62,9 @@ class ApikitBadRequestDetectorTest {
     }
 
     @Test
-    void missing_field() {
+    void missing_single_field() {
         // arrange
-        def inputEvent = getEvent([howdy: 123])
+        def inputEvent = getEvent([prop2: 'howdy'])
         def messageException = shouldFail {
             flow.process(inputEvent)
         }
@@ -81,6 +81,16 @@ class ApikitBadRequestDetectorTest {
                    is(equalTo('prop1'))
         assertThat error.reason,
                    is(equalTo('field is required and is missing'))
+    }
+
+    @Test
+    void missing_multiple_fields() {
+        // arrange
+
+        // act
+
+        // assert
+        fail 'write this'
     }
 
     @Test

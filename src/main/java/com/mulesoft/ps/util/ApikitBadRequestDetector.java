@@ -13,6 +13,6 @@ import java.util.List;
 public class ApikitBadRequestDetector {
     @Processor(friendlyName = "Parse Field Details")
     public List<FieldError> parse(@Default("#[exception]") BadRequestException exception) {
-        return null;
+        return ExceptionTransformer.transform(exception);
     }
 }
