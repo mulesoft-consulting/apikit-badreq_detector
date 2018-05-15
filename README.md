@@ -1,6 +1,6 @@
 # Purpose
 
-APIKit router (and the RAML libraries it depends on) does a decent job of validating incoming request payload. It does not do a great job of returning which fields failed validation in a parseable format. This connector attempts to parse the `BadRequestException` message and provide those details.
+APIKit router (and the RAML libraries it depends on) does a decent job of validating incoming request payload. It does not do a great job of returning which fields failed validation in a parseable format. This connector attempts to parse the `org.mule.module.apikit.exception.BadRequestException` message and provide those details.
 
 # Usage
 
