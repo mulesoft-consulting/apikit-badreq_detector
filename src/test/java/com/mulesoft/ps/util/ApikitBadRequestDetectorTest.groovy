@@ -162,6 +162,42 @@ class ApikitBadRequestDetectorTest {
     }
 
     @Test
+    void invalid_format() {
+        // arrange
+        def inputEvent = getEvent([prop1: 'howdy',
+                                   prop2: 'howdy',
+                                   prop3: 'howdy'])
+        def messageException = shouldFail {
+            flow.process(inputEvent)
+        }
+        def badRequestException = messageException.cause as BadRequestException
+        def connector = new ApikitBadRequestDetector()
+
+        // act
+        def errors = connector.parse(badRequestException)
+
+        // assert
+        assert errors.size() == 1
+        def error = errors[0]
+        assertThat error.fieldName,
+                   is(equalTo('(Unknown field name)'))
+        assertThat error.reason,
+                   is(equalTo("Expected type 'String' but got 'Integer'"))
+        // assert
+        fail 'write this'
+    }
+
+    @Test
+    void wrong_type_in_date_field() {
+        // arrange
+
+        // act
+
+        // assert
+        fail 'write this'
+    }
+
+    @Test
     void non_parseable_errors() {
         // arrange
 
