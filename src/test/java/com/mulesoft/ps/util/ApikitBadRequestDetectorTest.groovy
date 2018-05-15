@@ -86,11 +86,28 @@ class ApikitBadRequestDetectorTest {
     @Test
     void missing_multiple_fields() {
         // arrange
+        def inputEvent = getEvent([:])
+        def messageException = shouldFail {
+            flow.process(inputEvent)
+        }
+        def badRequestException = messageException.cause as BadRequestException
+        def connector = new ApikitBadRequestDetector()
 
         // act
+        def errors = connector.parse(badRequestException)
 
         // assert
-        fail 'write this'
+        assert errors.size() == 2
+        def error = errors[0]
+        assertThat error.fieldName,
+                   is(equalTo('prop1'))
+        assertThat error.reason,
+                   is(equalTo('field is required and is missing'))
+        error = errors[1]
+        assertThat error.fieldName,
+                   is(equalTo('prop2'))
+        assertThat error.reason,
+                   is(equalTo('field is required and is missing'))
     }
 
     @Test
