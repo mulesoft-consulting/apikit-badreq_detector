@@ -198,14 +198,34 @@ class ApikitBadRequestDetectorTest {
     }
 
     @Test
-    @Ignore
     void invalid_format_multiple() {
         // arrange
+        // arrange
+        def inputEvent = getEvent([prop1: 'howdy',
+                                   prop2: 'howdy',
+                                   prop3: 'howdy',
+                                   prop4: 'howdy2'])
+        def messageException = shouldFail {
+            flow.process(inputEvent)
+        }
+        def badRequestException = messageException.cause as BadRequestException
+        def connector = new ApikitBadRequestDetector()
 
         // act
+        def errors = connector.parse(badRequestException)
 
         // assert
-        fail 'write this'
+        assert errors.size() == 2
+        def error = errors[0]
+        assertThat error.fieldName,
+                   is(equalTo('(Unknown field name)'))
+        assertThat error.reason,
+                   is(equalTo("Provided value 'howdy' is not compliant with the format date_only provided in rfc3339"))
+        error = errors[1]
+        assertThat error.fieldName,
+                   is(equalTo('(Unknown field name)'))
+        assertThat error.reason,
+                   is(equalTo("Provided value 'howdy2' is not compliant with the format date_only provided in rfc3339"))
     }
 
     @Test
