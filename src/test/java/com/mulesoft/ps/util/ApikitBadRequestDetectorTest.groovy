@@ -184,13 +184,22 @@ class ApikitBadRequestDetectorTest {
                    is(equalTo('(Unknown field name)'))
         assertThat error.reason,
                    is(equalTo("Provided value 'howdy' is not compliant with the format date_only provided in rfc3339"))
+    }
+
+    @Test
+    @Ignore
+    void invalid_format_regex() {
+        // arrange
+
+        // act
+
         // assert
         fail 'write this'
     }
 
     @Test
     @Ignore
-    void invalid_format_regex() {
+    void invalid_format_multiple() {
         // arrange
 
         // act
