@@ -3,7 +3,6 @@ package com.mulesoft.ps.util
 import groovy.json.JsonOutput
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import org.junit.Ignore
 import org.junit.Test
 import org.mule.DefaultMuleEvent
 import org.mule.DefaultMuleMessage
@@ -263,16 +262,5 @@ class ApikitBadRequestDetectorTest {
                    is(equalTo('(Unknown field name)'))
         assertThat error.reason,
                    is(equalTo("Invalid element '99'. Did you supply the wrong type for a formatted field?"))
-    }
-
-    @Test
-    @Ignore
-    void non_parseable_errors() {
-        // arrange
-
-        // act
-
-        // assert
-        fail 'write this'
     }
 }

@@ -42,6 +42,8 @@ class ExceptionTransformer {
                 return new FieldError(UNKNOWN_FIELD_NAME,
                                       matcher.group(0))
             }
+            return new FieldError(UNKNOWN_FIELD_NAME,
+                                  'Unable to parse error, raw details: ' + errorForField)
         }.sort { FieldError error ->
             error.fieldName
         }
