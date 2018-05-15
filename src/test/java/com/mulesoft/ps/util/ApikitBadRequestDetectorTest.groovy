@@ -129,7 +129,7 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 1
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('prop1'))
+                   is(equalTo('(Unknown field name)'))
         assertThat error.reason,
                    is(equalTo("Expected type 'String' but got 'Integer'"))
     }
