@@ -16,6 +16,8 @@ import org.mule.context.DefaultMuleContextFactory
 import org.mule.module.apikit.exception.BadRequestException
 
 import static groovy.test.GroovyAssert.shouldFail
+import static org.hamcrest.Matchers.*
+import static org.junit.Assert.assertThat
 
 class ApikitBadRequestDetectorTest {
     private static Flow flow
@@ -70,14 +72,29 @@ class ApikitBadRequestDetectorTest {
         def connector = new ApikitBadRequestDetector()
 
         // act
-        connector.parse(badRequestException)
+        def errors = connector.parse(badRequestException)
+
+        // assert
+        assert errors.size() == 1
+        def error = errors[0]
+        assertThat error.fieldName,
+                   is(equalTo('prop1'))
+        assertThat error.reason,
+                   is(equalTo('field is required and is missing'))
+    }
+
+    @Test
+    void field_invalid_type() {
+        // arrange
+
+        // act
 
         // assert
         fail 'write this'
     }
 
     @Test
-    void field_invalid_type() {
+    void non_parseable_errors() {
         // arrange
 
         // act
