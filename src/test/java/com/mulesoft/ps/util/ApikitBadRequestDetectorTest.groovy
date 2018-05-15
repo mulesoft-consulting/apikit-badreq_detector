@@ -16,7 +16,8 @@ import org.mule.context.DefaultMuleContextFactory
 import org.mule.module.apikit.exception.BadRequestException
 
 import static groovy.test.GroovyAssert.shouldFail
-import static org.hamcrest.Matchers.*
+import static org.hamcrest.Matchers.equalTo
+import static org.hamcrest.Matchers.is
 import static org.junit.Assert.assertThat
 
 class ApikitBadRequestDetectorTest {
@@ -112,6 +113,29 @@ class ApikitBadRequestDetectorTest {
 
     @Test
     void field_invalid_type() {
+        // arrange
+        def inputEvent = getEvent([prop1: 99,
+                                   prop2: 'howdy'])
+        def messageException = shouldFail {
+            flow.process(inputEvent)
+        }
+        def badRequestException = messageException.cause as BadRequestException
+        def connector = new ApikitBadRequestDetector()
+
+        // act
+        def errors = connector.parse(badRequestException)
+
+        // assert
+        assert errors.size() == 1
+        def error = errors[0]
+        assertThat error.fieldName,
+                   is(equalTo('prop1'))
+        assertThat error.reason,
+                   is(equalTo("Expected type 'String' but got 'Integer'"))
+    }
+
+    @Test
+    void mixed_error_types() {
         // arrange
 
         // act
