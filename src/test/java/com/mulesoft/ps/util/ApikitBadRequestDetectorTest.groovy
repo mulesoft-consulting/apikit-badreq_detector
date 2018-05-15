@@ -9,6 +9,9 @@ import org.mule.api.transport.PropertyScope
 import org.mule.config.spring.SpringXmlConfigurationBuilder
 import org.mule.construct.Flow
 import org.mule.context.DefaultMuleContextFactory
+import org.mule.module.apikit.exception.BadRequestException
+
+import static groovy.test.GroovyAssert.shouldFail
 
 class ApikitBadRequestDetectorTest {
     @Test
@@ -39,11 +42,14 @@ class ApikitBadRequestDetectorTest {
         def event = new DefaultMuleEvent(message,
                                          MessageExchangePattern.REQUEST_RESPONSE,
                                          flow)
-        flow.process(event)
+        def messageException = shouldFail {
+            flow.process(event)
+        }
+        def badRequestException = messageException.cause as BadRequestException
         def connector = new ApikitBadRequestDetector()
 
         // act
-        connector.parse()
+        connector.parse(badRequestException)
 
         // assert
         fail 'write this'
