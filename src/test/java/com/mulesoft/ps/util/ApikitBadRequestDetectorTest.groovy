@@ -3,6 +3,7 @@ package com.mulesoft.ps.util
 import groovy.json.JsonOutput
 import org.junit.AfterClass
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.Test
 import org.mule.DefaultMuleEvent
 import org.mule.DefaultMuleMessage
@@ -151,14 +152,14 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 2
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('prop1'))
-        assertThat error.reason,
-                   is(equalTo('field is required and is missing'))
-        error = errors[1]
-        assertThat error.fieldName,
                    is(equalTo('(Unknown field name)'))
         assertThat error.reason,
                    is(equalTo("Expected type 'String' but got 'Integer'"))
+        error = errors[1]
+        assertThat error.fieldName,
+                   is(equalTo('prop1'))
+        assertThat error.reason,
+                   is(equalTo('field is required and is missing'))
     }
 
     @Test
@@ -182,12 +183,13 @@ class ApikitBadRequestDetectorTest {
         assertThat error.fieldName,
                    is(equalTo('(Unknown field name)'))
         assertThat error.reason,
-                   is(equalTo("Expected type 'String' but got 'Integer'"))
+                   is(equalTo("Provided value 'howdy' is not compliant with the format date_only provided in rfc3339"))
         // assert
         fail 'write this'
     }
 
     @Test
+    @Ignore
     void invalid_format_regex() {
         // arrange
 
@@ -198,6 +200,7 @@ class ApikitBadRequestDetectorTest {
     }
 
     @Test
+    @Ignore
     void wrong_type_in_date_field() {
         // arrange
 
@@ -208,6 +211,7 @@ class ApikitBadRequestDetectorTest {
     }
 
     @Test
+    @Ignore
     void non_parseable_errors() {
         // arrange
 

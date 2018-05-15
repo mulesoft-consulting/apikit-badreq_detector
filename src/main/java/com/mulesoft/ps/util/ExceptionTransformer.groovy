@@ -12,17 +12,21 @@ class ExceptionTransformer {
 
     static List<FieldError> transform(BadRequestException badRequestException) {
         def message = badRequestException.message
-        def matcher = requiredPattern.matcher(message)
-        def results = []
-        while (matcher.find()) {
-            results << new FieldError(matcher.group(1),
-                                      'field is required and is missing')
+        List<FieldError> results = []
+        message.split("\n").each { String errorForField ->
+            def matcher = requiredPattern.matcher(errorForField)
+            while (matcher.find()) {
+                results << new FieldError(matcher.group(1),
+                                          'field is required and is missing')
+            }
+            matcher = invalidTypePattern.matcher(errorForField)
+            while (matcher.find()) {
+                results << new FieldError('(Unknown field name)',
+                                          "Expected type '${matcher.group(2)}' but got '${matcher.group(1)}'")
+            }
         }
-        matcher = invalidTypePattern.matcher(message)
-        while (matcher.find()) {
-            results << new FieldError('(Unknown field name)',
-                                      "Expected type '${matcher.group(2)}' but got '${matcher.group(1)}'")
+        results.sort { FieldError error ->
+            error.fieldName
         }
-        results
     }
 }
