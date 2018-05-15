@@ -137,11 +137,28 @@ class ApikitBadRequestDetectorTest {
     @Test
     void mixed_error_types() {
         // arrange
+        def inputEvent = getEvent([prop2: 99])
+        def messageException = shouldFail {
+            flow.process(inputEvent)
+        }
+        def badRequestException = messageException.cause as BadRequestException
+        def connector = new ApikitBadRequestDetector()
 
         // act
+        def errors = connector.parse(badRequestException)
 
         // assert
-        fail 'write this'
+        assert errors.size() == 2
+        def error = errors[0]
+        assertThat error.fieldName,
+                   is(equalTo('prop1'))
+        assertThat error.reason,
+                   is(equalTo('field is required and is missing'))
+        error = errors[1]
+        assertThat error.fieldName,
+                   is(equalTo('(Unknown field name)'))
+        assertThat error.reason,
+                   is(equalTo("Expected type 'String' but got 'Integer'"))
     }
 
     @Test
