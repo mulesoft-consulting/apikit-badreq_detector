@@ -11,6 +11,7 @@ class ExceptionTransformer {
     private static final Pattern invalidFormatPattern = Pattern.compile(
             /Provided value (.*) (is not compliant with the format.*)/)
     private static final Pattern invalidElementPattern = Pattern.compile(/Invalid element (.*)\./)
+    private static final Pattern invalidValuePattern = Pattern.compile(/Invalid value .*/)
     private static final String UNKNOWN_FIELD_NAME = '(Unknown field name)'
 
     static List<FieldError> transform(BadRequestException badRequestException) {
@@ -36,6 +37,10 @@ class ExceptionTransformer {
             if (matcherCheck(invalidElementPattern)) {
                 return new FieldError(UNKNOWN_FIELD_NAME,
                                       "Invalid element '${matcher.group(1)}'. Did you supply the wrong type for a formatted field?")
+            }
+            if (matcherCheck(invalidValuePattern)) {
+                return new FieldError(UNKNOWN_FIELD_NAME,
+                                      matcher.group(0))
             }
         }.sort { FieldError error ->
             error.fieldName
