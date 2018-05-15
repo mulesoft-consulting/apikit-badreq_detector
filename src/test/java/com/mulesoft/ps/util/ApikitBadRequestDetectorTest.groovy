@@ -229,14 +229,27 @@ class ApikitBadRequestDetectorTest {
     }
 
     @Test
-    @Ignore
     void wrong_type_in_date_field() {
         // arrange
+        def inputEvent = getEvent([prop1: 'howdy',
+                                   prop2: 'howdy',
+                                   prop3: 99])
+        def messageException = shouldFail {
+            flow.process(inputEvent)
+        }
+        def badRequestException = messageException.cause as BadRequestException
+        def connector = new ApikitBadRequestDetector()
 
         // act
+        def errors = connector.parse(badRequestException)
 
         // assert
-        fail 'write this'
+        assert errors.size() == 1
+        def error = errors[0]
+        assertThat error.fieldName,
+                   is(equalTo('(Unknown field name)'))
+        assertThat error.reason,
+                   is(equalTo("Invalid element '99'. Did you supply the wrong type for a formatted field?"))
     }
 
     @Test
