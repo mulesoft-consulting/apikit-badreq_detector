@@ -1,6 +1,7 @@
 package com.mulesoft.ps.util
 
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
@@ -9,6 +10,7 @@ import org.mule.DefaultMuleMessage
 import org.mule.MessageExchangePattern
 import org.mule.api.MuleContext
 import org.mule.api.MuleEvent
+import org.mule.api.MuleMessage
 import org.mule.api.transport.PropertyScope
 import org.mule.config.spring.SpringXmlConfigurationBuilder
 import org.mule.construct.Flow
@@ -43,12 +45,12 @@ class ApikitBadRequestDetectorTest {
         def message = new DefaultMuleMessage(JsonOutput.toJson(payload), muleContext)
         def inboundProp = { String prop, String value ->
             message.setProperty(prop,
-                                value,
-                                PropertyScope.INBOUND)
+                    value,
+                    PropertyScope.INBOUND)
         }
         def httpProp = { String prop, String value ->
             inboundProp("http.${prop}",
-                        value)
+                    value)
         }
         httpProp('listener.path', '/')
         httpProp('relative.path', '/')
@@ -58,8 +60,31 @@ class ApikitBadRequestDetectorTest {
         inboundProp('host', 'localhost')
         inboundProp('Content-Type', 'application/json')
         new DefaultMuleEvent(message,
-                             MessageExchangePattern.REQUEST_RESPONSE,
-                             flow)
+                MessageExchangePattern.REQUEST_RESPONSE,
+                flow)
+    }
+
+    @Test
+    void integration() {
+        // arrange
+        def flow = muleContext.registry.get('api-main-with-strategy') as Flow
+        def inputEvent = getEvent([prop2: 'howdy'])
+
+        // act
+        def responseEvent = flow.process(inputEvent)
+        def message = responseEvent.message
+        def errors = message.payload
+        assert errors instanceof List<FieldError>
+
+        // assert
+        assert errors.size() == 1
+        def error = errors[0]
+        assertThat error.fieldName,
+                is(equalTo('prop1'))
+        assertThat error.reason,
+                is(equalTo('field is required and is missing'))
+        assertThat message.getProperty('http.status', PropertyScope.OUTBOUND),
+                is(equalTo(400))
     }
 
     @Test
@@ -79,9 +104,9 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 1
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('prop1'))
+                is(equalTo('prop1'))
         assertThat error.reason,
-                   is(equalTo('field is required and is missing'))
+                is(equalTo('field is required and is missing'))
     }
 
     @Test
@@ -101,14 +126,14 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 2
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('prop1'))
+                is(equalTo('prop1'))
         assertThat error.reason,
-                   is(equalTo('field is required and is missing'))
+                is(equalTo('field is required and is missing'))
         error = errors[1]
         assertThat error.fieldName,
-                   is(equalTo('prop2'))
+                is(equalTo('prop2'))
         assertThat error.reason,
-                   is(equalTo('field is required and is missing'))
+                is(equalTo('field is required and is missing'))
     }
 
     @Test
@@ -129,9 +154,9 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 1
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('(Unknown field name)'))
+                is(equalTo('(Unknown field name)'))
         assertThat error.reason,
-                   is(equalTo("Expected type 'String' but got 'Integer'"))
+                is(equalTo("Expected type 'String' but got 'Integer'"))
     }
 
     @Test
@@ -151,14 +176,14 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 2
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('(Unknown field name)'))
+                is(equalTo('(Unknown field name)'))
         assertThat error.reason,
-                   is(equalTo("Expected type 'String' but got 'Integer'"))
+                is(equalTo("Expected type 'String' but got 'Integer'"))
         error = errors[1]
         assertThat error.fieldName,
-                   is(equalTo('prop1'))
+                is(equalTo('prop1'))
         assertThat error.reason,
-                   is(equalTo('field is required and is missing'))
+                is(equalTo('field is required and is missing'))
     }
 
     @Test
@@ -180,9 +205,9 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 1
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('(Unknown field name)'))
+                is(equalTo('(Unknown field name)'))
         assertThat error.reason,
-                   is(equalTo("Provided value 'howdy' is not compliant with the format date_only provided in rfc3339"))
+                is(equalTo("Provided value 'howdy' is not compliant with the format date_only provided in rfc3339"))
     }
 
     @Test
@@ -204,9 +229,9 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 1
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('(Unknown field name)'))
+                is(equalTo('(Unknown field name)'))
         assertThat error.reason,
-                   is(equalTo("Invalid value 'howdy'. Expected ^.+@.+\\..+\$"))
+                is(equalTo("Invalid value 'howdy'. Expected ^.+@.+\\..+\$"))
     }
 
     @Test
@@ -230,14 +255,14 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 2
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('(Unknown field name)'))
+                is(equalTo('(Unknown field name)'))
         assertThat error.reason,
-                   is(equalTo("Provided value 'howdy' is not compliant with the format date_only provided in rfc3339"))
+                is(equalTo("Provided value 'howdy' is not compliant with the format date_only provided in rfc3339"))
         error = errors[1]
         assertThat error.fieldName,
-                   is(equalTo('(Unknown field name)'))
+                is(equalTo('(Unknown field name)'))
         assertThat error.reason,
-                   is(equalTo("Provided value 'howdy2' is not compliant with the format date_only provided in rfc3339"))
+                is(equalTo("Provided value 'howdy2' is not compliant with the format date_only provided in rfc3339"))
     }
 
     @Test
@@ -259,8 +284,8 @@ class ApikitBadRequestDetectorTest {
         assert errors.size() == 1
         def error = errors[0]
         assertThat error.fieldName,
-                   is(equalTo('(Unknown field name)'))
+                is(equalTo('(Unknown field name)'))
         assertThat error.reason,
-                   is(equalTo("Invalid element '99'. Did you supply the wrong type for a formatted field?"))
+                is(equalTo("Invalid element '99'. Did you supply the wrong type for a formatted field?"))
     }
 }
